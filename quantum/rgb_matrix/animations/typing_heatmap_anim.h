@@ -6,6 +6,17 @@ RGB_MATRIX_EFFECT(TYPING_HEATMAP)
 #            define RGB_MATRIX_TYPING_HEATMAP_DECREASE_DELAY_MS 25
 #        endif
 
+#        ifndef RGB_MATRIX_TYPING_HEATMAP_BACKGROUND_HSV
+#            define RGB_MATRIX_TYPING_HEATMAP_BACKGROUND_HSV \
+                { HSV_OFF }
+#        endif
+
+// A timer to track the last time we decremented all heatmap values.
+static uint16_t heatmap_decrease_timer;
+// Whether we should decrement the heatmap values during the next update.
+static bool decrease_heatmap_values;
+static HSV  backgroundHsv = RGB_MATRIX_TYPING_HEATMAP_BACKGROUND_HSV;
+
 void process_rgb_matrix_typing_heatmap(uint8_t row, uint8_t col) {
 #        ifdef RGB_MATRIX_TYPING_HEATMAP_SLIM
     // Limit effect to pressed keys
@@ -34,11 +45,6 @@ void process_rgb_matrix_typing_heatmap(uint8_t row, uint8_t col) {
 #        endif
 }
 
-// A timer to track the last time we decremented all heatmap values.
-static uint16_t heatmap_decrease_timer;
-// Whether we should decrement the heatmap values during the next update.
-static bool decrease_heatmap_values;
-
 bool TYPING_HEATMAP(effect_params_t* params) {
     // Modified version of RGB_MATRIX_USE_LIMITS to work off of matrix row / col size
     uint8_t led_min = RGB_MATRIX_LED_PROCESS_LIMIT * params->iter;
@@ -46,7 +52,8 @@ bool TYPING_HEATMAP(effect_params_t* params) {
     if (led_max > sizeof(g_rgb_frame_buffer)) led_max = sizeof(g_rgb_frame_buffer);
 
     if (params->init) {
-        rgb_matrix_set_color_all(0, 0, 0);
+        RGB backgroundRgb = rgb_matrix_hsv_to_rgb(backgroundHsv);
+        rgb_matrix_set_color_all(backgroundRgb.r, backgroundRgb.g, backgroundRgb.b);
         memset(g_rgb_frame_buffer, 0, sizeof g_rgb_frame_buffer);
     }
 
@@ -75,7 +82,7 @@ bool TYPING_HEATMAP(effect_params_t* params) {
             if (!HAS_ANY_FLAGS(g_led_config.flags[led[j]], params->flags)) continue;
 
             HSV hsv = {170 - qsub8(val, 85), rgb_matrix_config.hsv.s, scale8((qadd8(170, val) - 170) * 3, rgb_matrix_config.hsv.v)};
-            RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
+            RGB rgb = hsv.h == 170 ? rgb_matrix_hsv_to_rgb(backgroundHsv) : rgb_matrix_hsv_to_rgb(hsv);
             rgb_matrix_set_color(led[j], rgb.r, rgb.g, rgb.b);
         }
 
