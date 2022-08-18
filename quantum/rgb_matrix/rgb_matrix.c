@@ -202,6 +202,14 @@ void rgb_matrix_update_pwm_buffers(void) {
 }
 
 void rgb_matrix_set_color(int index, uint8_t red, uint8_t green, uint8_t blue) {
+// #if defined(RGB_MATRIX_ENABLE) && defined(RGB_MATRIX_BACKGROUND_HSV)
+//     if (red == 0 && green == 0 && blue == 0) {
+//         HSV hsv = RGB_MATRIX_BACKGROUND_HSV;
+//         RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
+//         rgb_matrix_set_color(index, rgb.r, rgb.g, rgb.b);
+//         return;
+//     }
+// #endif
     rgb_matrix_driver.set_color(index, red, green, blue);
 }
 

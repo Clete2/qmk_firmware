@@ -81,8 +81,16 @@ bool TYPING_HEATMAP(effect_params_t* params) {
         for (uint8_t j = 0; j < led_count; ++j) {
             if (!HAS_ANY_FLAGS(g_led_config.flags[led[j]], params->flags)) continue;
 
-            HSV hsv = {170 - qsub8(val, 85), rgb_matrix_config.hsv.s, scale8((qadd8(170, val) - 170) * 3, rgb_matrix_config.hsv.v)};
-            RGB rgb = hsv.h == 170 ? rgb_matrix_hsv_to_rgb(backgroundHsv) : rgb_matrix_hsv_to_rgb(hsv);
+            uint8_t hue = qsub8(val, 85);
+
+            RGB rgb;
+            if (hue == 0x00) {
+                rgb = rgb_matrix_hsv_to_rgb(backgroundHsv);
+            } else {
+                HSV hsv = {170 - hue, rgb_matrix_config.hsv.s, scale8((qadd8(170, val) - 170) * 3, rgb_matrix_config.hsv.v)};
+                rgb = rgb_matrix_hsv_to_rgb(hsv);
+            }
+
             rgb_matrix_set_color(led[j], rgb.r, rgb.g, rgb.b);
         }
 

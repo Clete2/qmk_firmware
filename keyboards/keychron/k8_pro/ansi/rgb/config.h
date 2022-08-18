@@ -64,6 +64,7 @@
 /* HSV -> 25 scale8 -> 35 http://fastled.io/docs/3.1/group___scaling.html */
 /* V -> 48 / 100 * 255 -> rounded */
 #    define RGB_MATRIX_TYPING_HEATMAP_BACKGROUND_HSV {HSV_WHITE}
+#    define RGB_MATRIX_BACKGROUND_HSV {HSV_WHITE}
 #    define ENABLE_RGB_MATRIX_DIGITAL_RAIN
 #    define ENABLE_RGB_MATRIX_TYPING_HEATMAP
 #    define ENABLE_RGB_MATRIX_CYCLE_ALL
